@@ -662,6 +662,7 @@
                 document.getElementById("new-requests-list").innerHTML = renderNewRequests(repairRequests);
                 document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
             }
+            history.pushState({ v: 'dashboard' }, '');
             closeMobileMenu();
         }
 
@@ -676,6 +677,7 @@
             syncLogoutButtons(false);
             document.getElementById("login-email").value = "";
             document.getElementById("login-password").value = "";
+            history.replaceState({ v: 'auth' }, '');
             closeMobileMenu();
         }
 
@@ -687,6 +689,7 @@
         function showNewRequestForm() {
             document.getElementById("new-request-form").classList.remove("hidden");
             document.getElementById("new-request-form").scrollIntoView({ behavior: "smooth", block: "start" });
+            history.pushState({ v: 'form' }, '');
         }
 
         function hideNewRequestForm() {
@@ -737,6 +740,7 @@
             calculateTotalCost();
             document.getElementById("edit-order-modal").classList.remove("hidden");
             document.body.style.overflow = "hidden";
+            history.pushState({ v: 'modal' }, '');
         }
 
         function closeEditModal() {
@@ -869,6 +873,49 @@
             });
 
             document.getElementById("login-email").value = "test@example.com";
+
+            // Устанавливаем начальное состояние истории
+            history.replaceState({ v: 'auth' }, '');
+
+            // Кнопка "Назад" в браузере и на телефоне
+            window.addEventListener('popstate', function(e) {
+                const v = (e.state && e.state.v) || 'auth';
+
+                // Закрыть модальное окно
+                if (!document.getElementById('edit-order-modal').classList.contains('hidden')) {
+                    document.getElementById("edit-order-modal").classList.add("hidden");
+                    document.body.style.overflow = "";
+                    editingOrderId = null;
+                    return;
+                }
+
+                // Закрыть форму новой заявки
+                if (!document.getElementById('new-request-form').classList.contains('hidden')) {
+                    document.getElementById("new-request-form").classList.add("hidden");
+                    document.getElementById("device-type").value = "";
+                    document.getElementById("device-brand").value = "";
+                    document.getElementById("problem-description").value = "";
+                    return;
+                }
+
+                // Вернуться на экран входа
+                if (v === 'auth' && currentUser) {
+                    currentUser = null;
+                    document.getElementById("auth-section").classList.remove("hidden");
+                    document.getElementById("client-dashboard").classList.add("hidden");
+                    document.getElementById("admin-dashboard").classList.add("hidden");
+                    document.getElementById("user-info").innerHTML = "";
+                    document.getElementById("user-info-mobile").innerHTML = "";
+                    syncLogoutButtons(false);
+                    closeMobileMenu();
+                    return;
+                }
+
+                // Уже на экране входа — не уходить с сайта
+                if (!currentUser) {
+                    history.pushState({ v: 'auth' }, '');
+                }
+            });
         });
 
         window.viewRequestDetails = viewRequestDetails;
