@@ -24,19 +24,13 @@
                     },
                     fontFamily: {
                         'inter': ['Inter', 'sans-serif']
-                    },
-                    spacing: {
-                        '128': '32rem',
-                        '144': '36rem'
                     }
                 }
             }
         }
     </script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        body { font-family: 'Inter', sans-serif; }
         .status-new { background-color: #fef3c7; color: #92400e; }
         .status-in-progress { background-color: #dbeafe; color: #1e40af; }
         .status-completed { background-color: #d1fae5; color: #065f46; }
@@ -46,6 +40,7 @@
     </style>
 </head>
 <body class="min-h-screen bg-gray-50 font-inter">
+
     <!-- Навигация -->
     <header class="bg-white shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-4 py-3">
@@ -54,24 +49,38 @@
                     <i class="fas fa-laptop-code text-2xl text-primary"></i>
                     <h1 class="text-xl font-bold text-dark">PC Services</h1>
                 </div>
-                <ul id="nav-menu" class="flex space-x-6"></ul>
-                <div class="flex items-center space-x-4">
-                    <div id="user-info" class="flex items-center space-x-2"></div>
-                    <button id="logout-btn" class="hidden bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition">Выйти</button>
+                <div class="flex items-center space-x-2">
+                    <!-- Десктоп: навигация и пользователь -->
+                    <ul id="nav-menu" class="hidden md:flex space-x-6 mr-4"></ul>
+                    <div id="user-info" class="hidden md:flex items-center"></div>
+                    <button id="logout-btn" class="hidden bg-red-100 text-red-700 px-3 py-1.5 text-sm rounded-lg hover:bg-red-200 transition md:ml-2">Выйти</button>
+                    <!-- Мобильный: кнопка-гамбургер -->
+                    <button id="hamburger-btn" class="md:hidden text-gray-600 hover:text-primary p-2 rounded-lg">
+                        <i id="hamburger-icon" class="fas fa-bars text-xl"></i>
+                    </button>
                 </div>
+            </div>
+            <!-- Мобильное меню -->
+            <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100 mt-3 pt-3 pb-1">
+                <ul id="nav-menu-mobile" class="space-y-1 mb-3"></ul>
+                <div id="user-info-mobile" class="mb-2"></div>
+                <button id="logout-btn-mobile" class="hidden w-full bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition text-sm font-medium">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Выйти
+                </button>
             </div>
         </nav>
     </header>
 
     <!-- Основной контент -->
-    <main class="container mx-auto px-4 py-8">
+    <main class="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+
         <!-- Экран авторизации -->
-        <section id="auth-section" class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+        <section id="auth-section" class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-5 sm:p-8">
             <h2 class="text-2xl font-bold text-center text-dark mb-6">Вход в систему</h2>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Роль пользователя</label>
-                    <select id="user-role" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <select id="user-role" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base">
                         <option value="client">Клиент</option>
                         <option value="master">Мастер</option>
                         <option value="admin">Администратор</option>
@@ -79,32 +88,32 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="login-email" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="email@example.com">
+                    <input type="email" id="login-email" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base" placeholder="email@example.com">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Пароль</label>
-                    <input type="password" id="login-password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="••••••••">
+                    <input type="password" id="login-password" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base" placeholder="••••••••">
                 </div>
-                <button id="login-btn" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-secondary transition">Войти</button>
+                <button id="login-btn" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-secondary transition text-base">Войти</button>
             </div>
         </section>
 
         <!-- Панель клиента -->
         <section id="client-dashboard" class="hidden">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold text-dark">Личный кабинет клиента</h2>
-                <button id="new-request-btn" class="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary transition">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6 sm:mb-8">
+                <h2 class="text-xl sm:text-2xl font-bold text-dark">Личный кабинет клиента</h2>
+                <button id="new-request-btn" class="bg-primary text-white px-5 py-3 rounded-lg font-medium hover:bg-secondary transition w-full sm:w-auto text-center">
                     <i class="fas fa-plus mr-2"></i>Новая заявка
                 </button>
             </div>
 
             <!-- Форма создания заявки -->
-            <div id="new-request-form" class="hidden bg-white rounded-xl shadow-lg p-6 mb-8">
-                <h3 class="text-xl font-bold text-dark mb-4">Создание заявки на ремонт</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div id="new-request-form" class="hidden bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+                <h3 class="text-lg sm:text-xl font-bold text-dark mb-4">Создание заявки на ремонт</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Тип устройства</label>
-                        <select id="device-type" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <select id="device-type" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base">
                             <option value="">Выберите тип устройства</option>
                             <option value="laptop">Ноутбук</option>
                             <option value="desktop">Стационарный компьютер</option>
@@ -115,126 +124,128 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Бренд</label>
-                        <input type="text" id="device-brand" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Например: Dell, HP, Lenovo">
+                        <input type="text" id="device-brand" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base" placeholder="Например: Dell, HP, Lenovo">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Описание проблемы</label>
-                        <textarea id="problem-description" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Подробно опишите проблему..."></textarea>
+                        <textarea id="problem-description" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base" placeholder="Подробно опишите проблему..."></textarea>
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Фотография устройства (опционально)</label>
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center">
                             <i class="fas fa-camera text-3xl text-gray-400 mb-2"></i>
-                            <p class="text-gray-500">Перетащите фото сюда или нажмите для загрузки</p>
+                            <p class="text-gray-500 text-sm">Перетащите фото сюда или нажмите для загрузки</p>
                             <input type="file" id="device-photo" class="hidden" accept="image/*">
-                            <button id="upload-photo-btn" class="mt-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">Выбрать файл</button>
+                            <button id="upload-photo-btn" class="mt-3 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition text-sm">Выбрать файл</button>
                         </div>
                     </div>
                 </div>
-                <div class="flex justify-end space-x-4 mt-6">
-                    <button id="cancel-request-btn" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Отмена</button>
-                    <button id="submit-request-btn" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-secondary transition">Отправить заявку</button>
+                <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-4 mt-5 sm:mt-6">
+                    <button id="cancel-request-btn" class="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-center">Отмена</button>
+                    <button id="submit-request-btn" class="bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-secondary transition text-center">Отправить заявку</button>
                 </div>
             </div>
 
             <!-- Активные заявки -->
-            <div class="mb-8">
-                <h3 class="text-xl font-bold text-dark mb-4">Активные заявки</h3>
-                <div id="active-requests" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div class="mb-6 sm:mb-8">
+                <h3 class="text-lg sm:text-xl font-bold text-dark mb-4">Активные заявки</h3>
+                <div id="active-requests" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
             </div>
 
             <!-- История заказов -->
             <div>
-                <h3 class="text-xl font-bold text-dark mb-4">История заказов</h3>
+                <h3 class="text-lg sm:text-xl font-bold text-dark mb-4">История заказов</h3>
                 <div id="order-history" class="bg-white rounded-xl shadow overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Устройство</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Стоимость</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-table-body" class="bg-white divide-y divide-gray-200"></tbody>
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Устройство</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Стоимость</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Панель администратора -->
         <section id="admin-dashboard" class="hidden">
-            <h2 class="text-2xl font-bold text-dark mb-8">Панель администратора</h2>
-            
+            <h2 class="text-xl sm:text-2xl font-bold text-dark mb-6 sm:mb-8">Панель администратора</h2>
+
             <!-- Статистика -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow p-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+                <div class="bg-white rounded-xl shadow p-4 sm:p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-500">Новые заявки</p>
+                            <p class="text-xs sm:text-sm text-gray-500">Новые заявки</p>
                             <p id="new-requests-count" class="text-2xl font-bold text-dark">0</p>
                         </div>
-                        <i class="fas fa-inbox text-3xl text-blue-500"></i>
+                        <i class="fas fa-inbox text-2xl sm:text-3xl text-blue-500"></i>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow p-6">
+                <div class="bg-white rounded-xl shadow p-4 sm:p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-500">В работе</p>
+                            <p class="text-xs sm:text-sm text-gray-500">В работе</p>
                             <p id="in-progress-count" class="text-2xl font-bold text-dark">0</p>
                         </div>
-                        <i class="fas fa-tools text-3xl text-yellow-500"></i>
+                        <i class="fas fa-tools text-2xl sm:text-3xl text-yellow-500"></i>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow p-6">
+                <div class="bg-white rounded-xl shadow p-4 sm:p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-500">Завершено</p>
+                            <p class="text-xs sm:text-sm text-gray-500">Завершено</p>
                             <p id="completed-count" class="text-2xl font-bold text-dark">0</p>
                         </div>
-                        <i class="fas fa-check-circle text-3xl text-green-500"></i>
+                        <i class="fas fa-check-circle text-2xl sm:text-3xl text-green-500"></i>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow p-6">
+                <div class="bg-white rounded-xl shadow p-4 sm:p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-500">Общая выручка</p>
-                            <p id="total-revenue" class="text-2xl font-bold text-dark">0 сум</p>
+                            <p class="text-xs sm:text-sm text-gray-500">Выручка</p>
+                            <p id="total-revenue" class="text-xl sm:text-2xl font-bold text-dark">0 сум</p>
                         </div>
-                        <i class="fas fa-chart-line text-3xl text-purple-500"></i>
+                        <i class="fas fa-chart-line text-2xl sm:text-3xl text-purple-500"></i>
                     </div>
                 </div>
             </div>
 
             <!-- Новые заявки -->
-            <div class="mb-8">
-                <h3 class="text-xl font-bold text-dark mb-4">Новые заявки</h3>
+            <div class="mb-6 sm:mb-8">
+                <h3 class="text-lg sm:text-xl font-bold text-dark mb-4">Новые заявки</h3>
                 <div id="new-requests-list" class="space-y-4"></div>
             </div>
 
             <!-- Заказы в работе -->
-            <div class="mb-8">
-                <h3 class="text-xl font-bold text-dark mb-4">Заказы в работе</h3>
+            <div class="mb-6 sm:mb-8">
+                <h3 class="text-lg sm:text-xl font-bold text-dark mb-4">Заказы в работе</h3>
                 <div id="in-progress-orders" class="space-y-4"></div>
             </div>
 
             <!-- Модальное окно редактирования заказа -->
-            <div id="edit-order-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-bold text-dark">Редактирование заказа #<span id="modal-order-id"></span></h3>
-                            <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600">
-                                <i class="fas fa-times text-2xl"></i>
+            <div id="edit-order-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center">
+                <div class="bg-white rounded-t-2xl sm:rounded-xl shadow-lg w-full sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto sm:mx-4">
+                    <div class="p-4 sm:p-6">
+                        <div class="flex justify-between items-center mb-5">
+                            <h3 class="text-lg sm:text-xl font-bold text-dark">Редактирование заказа #<span id="modal-order-id"></span></h3>
+                            <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 p-1">
+                                <i class="fas fa-times text-xl sm:text-2xl"></i>
                             </button>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-5">
                             <div>
                                 <h4 class="font-medium text-gray-700 mb-2">Информация о заказе</h4>
-                                <div class="space-y-2">
+                                <div class="space-y-2 text-sm sm:text-base">
                                     <p><span class="font-medium">Клиент:</span> <span id="modal-client-name"></span></p>
                                     <p><span class="font-medium">Устройство:</span> <span id="modal-device"></span></p>
                                     <p><span class="font-medium">Проблема:</span> <span id="modal-problem"></span></p>
@@ -242,7 +253,7 @@
                             </div>
                             <div>
                                 <h4 class="font-medium text-gray-700 mb-2">Статус заказа</h4>
-                                <select id="modal-status" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <select id="modal-status" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base">
                                     <option value="new">Новая</option>
                                     <option value="in-progress">В работе</option>
                                     <option value="completed">Завершено</option>
@@ -252,36 +263,36 @@
                         </div>
 
                         <!-- Учет запчастей -->
-                        <div class="mb-6">
-                            <h4 class="font-medium text-gray-700 mb-4">Использованные запчасти</h4>
-                            <div id="parts-list" class="space-y-3 mb-4"></div>
-                            <button id="add-part-btn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">
+                        <div class="mb-5">
+                            <h4 class="font-medium text-gray-700 mb-3">Использованные запчасти</h4>
+                            <div id="parts-list" class="space-y-3 mb-3"></div>
+                            <button id="add-part-btn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition text-sm">
                                 <i class="fas fa-plus mr-2"></i>Добавить запчасть
                             </button>
                         </div>
 
                         <!-- Стоимость услуг -->
-                        <div class="mb-6">
-                            <h4 class="font-medium text-gray-700 mb-4">Стоимость услуг</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="mb-5">
+                            <h4 class="font-medium text-gray-700 mb-3">Стоимость услуг</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Стоимость работы</label>
-                                    <input type="number" id="labor-cost" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+                                    <input type="number" id="labor-cost" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base" placeholder="0">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Стоимость запчастей</label>
-                                    <input type="number" id="parts-cost" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0" readonly>
+                                    <input type="number" id="parts-cost" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base" placeholder="0" readonly>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Итоговая сумма</label>
-                                    <input type="number" id="total-cost" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0" readonly>
+                                    <input type="number" id="total-cost" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-transparent text-base" placeholder="0" readonly>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex justify-end space-x-4">
-                            <button id="cancel-edit-btn" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Отмена</button>
-                            <button id="save-order-btn" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-secondary transition">Сохранить изменения</button>
+                        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-4">
+                            <button id="cancel-edit-btn" class="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-center">Отмена</button>
+                            <button id="save-order-btn" class="bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-secondary transition text-center">Сохранить изменения</button>
                         </div>
                     </div>
                 </div>
@@ -292,17 +303,17 @@
     <!-- Футер -->
     <footer class="bg-dark text-white mt-12">
         <div class="container mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                 <div>
                     <div class="flex items-center space-x-2 mb-4">
                         <i class="fas fa-laptop-code text-2xl text-accent"></i>
                         <h3 class="text-xl font-bold">PC Services</h3>
                     </div>
-                    <p class="text-gray-300">Профессиональный сервисный центр по ремонту компьютерной техники. Быстро, качественно, с гарантией.</p>
+                    <p class="text-gray-300 text-sm">Профессиональный сервисный центр по ремонту компьютерной техники. Быстро, качественно, с гарантией.</p>
                 </div>
                 <div>
                     <h4 class="text-lg font-bold mb-4">Контакты</h4>
-                    <ul class="space-y-2">
+                    <ul class="space-y-2 text-sm">
                         <li class="flex items-center space-x-2">
                             <i class="fas fa-phone text-accent"></i>
                             <span>+998 93 489 07 04</span>
@@ -319,14 +330,14 @@
                 </div>
                 <div>
                     <h4 class="text-lg font-bold mb-4">Часы работы</h4>
-                    <ul class="space-y-2">
+                    <ul class="space-y-2 text-sm">
                         <li>Пн-Пт: 9:00 - 20:00</li>
                         <li>Сб: 10:00 - 18:00</li>
                         <li>Вс: 10:00 - 16:00</li>
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm">
                 <p>&copy; 2024 PC Services. Все права защищены.</p>
             </div>
         </div>
@@ -362,7 +373,6 @@
             "admin": { "label": "Администратор", "class": "user-admin", "icon": "fas fa-user-cog" }
         };
 
-        // Примерные данные заявок
         let repairRequests = [
             {
                 "id": 1,
@@ -388,9 +398,7 @@
                 "status": "in-progress",
                 "createdAt": "2024-01-14",
                 "laborCost": 2000,
-                "parts": [
-                    { "name": "Оперативная память 8GB", "cost": 3500 }
-                ],
+                "parts": [{ "name": "Оперативная память 8GB", "cost": 3500 }],
                 "totalCost": 5500,
                 "photo": "https://picsum.photos/400/300?random=102"
             },
@@ -430,44 +438,52 @@
         let currentUser = null;
         let editingOrderId = null;
 
-        // ==================== ФУНКЦИИ РЕНДЕРИНГА ====================
+        // ==================== РЕНДЕРИНГ ====================
         function renderNavigation(items) {
-            return items.map(item => 
-                "<li><a href=\"" + item.href + "\" class=\"flex items-center space-x-1 text-gray-600 hover:text-primary transition\"><i class=\"" + item.icon + "\"></i><span>" + item.label + "</span></a></li>"
+            return items.map(item =>
+                `<li><a href="${item.href}" class="flex items-center space-x-1 text-gray-600 hover:text-primary transition text-sm"><i class="${item.icon}"></i><span>${item.label}</span></a></li>`
+            ).join("");
+        }
+
+        function renderNavigationMobile(items) {
+            return items.map(item =>
+                `<li><a href="${item.href}" class="flex items-center space-x-2 text-gray-700 hover:text-primary transition py-2 px-2 rounded-lg hover:bg-gray-50"><i class="${item.icon} w-4"></i><span>${item.label}</span></a></li>`
             ).join("");
         }
 
         function renderUserInfo(user) {
             if (!user) return "";
             const userType = userTypes[user.role];
-            return "<div class=\"flex items-center space-x-2 px-3 py-1 rounded-full " + userType.class + "\"><i class=\"" + userType.icon + "\"></i><span>" + userType.label + ": " + user.name + "</span></div>";
+            return `<div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-sm ${userType.class}"><i class="${userType.icon}"></i><span class="hidden sm:inline">${userType.label}: ${user.name}</span><span class="sm:hidden">${user.name}</span></div>`;
         }
 
         function renderActiveRequests(requests) {
-            return requests.filter(r => r.status !== "completed" && r.status !== "cancelled")
-                .map(request => {
-                    const status = statusConfig[request.status];
-                    return `
-                    <div class="bg-white rounded-xl shadow p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h4 class="font-bold text-dark">Заявка #${request.id}</h4>
-                                <p class="text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</p>
-                            </div>
-                            <span class="px-3 py-1 rounded-full text-sm font-medium ${status.class}">
-                                <i class="${status.icon} mr-1"></i>${status.label}
-                            </span>
+            const filtered = requests.filter(r => r.status !== "completed" && r.status !== "cancelled");
+            if (filtered.length === 0) {
+                return `<div class="col-span-full text-center text-gray-500 py-8"><i class="fas fa-inbox text-4xl mb-3 block text-gray-300"></i>Активных заявок нет</div>`;
+            }
+            return filtered.map(request => {
+                const status = statusConfig[request.status];
+                return `
+                <div class="bg-white rounded-xl shadow p-4 sm:p-6">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-bold text-dark">Заявка #${request.id}</h4>
+                            <p class="text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</p>
                         </div>
-                        <p class="text-gray-600 mb-4">${request.problem}</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">${request.createdAt}</span>
-                            <button class="text-primary hover:text-secondary font-medium" onclick="viewRequestDetails(${request.id})">
-                                Подробнее <i class="fas fa-arrow-right ml-1"></i>
-                            </button>
-                        </div>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${status.class} ml-2 flex-shrink-0">
+                            <i class="${status.icon} mr-1"></i>${status.label}
+                        </span>
                     </div>
-                    `;
-                }).join("");
+                    <p class="text-gray-600 text-sm mb-4">${request.problem}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500">${request.createdAt}</span>
+                        <button class="text-primary hover:text-secondary font-medium text-sm" onclick="viewRequestDetails(${request.id})">
+                            Подробнее <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>`;
+            }).join("");
         }
 
         function renderOrderHistory(requests) {
@@ -476,55 +492,51 @@
                     const status = statusConfig[request.status];
                     return `
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.createdAt}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-3 py-1 rounded-full text-xs font-medium ${status.class}">
-                                ${status.label}
-                            </span>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.createdAt}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${status.class}">${status.label}</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${request.totalCost > 0 ? "text-green-600" : "text-gray-500"}">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${request.totalCost > 0 ? "text-green-600" : "text-gray-500"}">
                             ${request.totalCost > 0 ? request.totalCost + " сум" : "—"}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <button onclick="leaveReview(${request.id})" class="text-primary hover:text-secondary mr-3">
-                                <i class="fas fa-star mr-1"></i>Отзыв
+                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                            <button onclick="leaveReview(${request.id})" class="text-primary hover:text-secondary mr-2">
+                                <i class="fas fa-star mr-1"></i><span class="hidden sm:inline">Отзыв</span>
                             </button>
                             <button onclick="viewRequestDetails(${request.id})" class="text-gray-600 hover:text-dark">
-                                <i class="fas fa-eye mr-1"></i>Просмотр
+                                <i class="fas fa-eye mr-1"></i><span class="hidden sm:inline">Просмотр</span>
                             </button>
                         </td>
-                    </tr>
-                    `;
+                    </tr>`;
                 }).join("");
         }
 
         function renderNewRequests(requests) {
             return requests.filter(r => r.status === "new")
                 .map(request => `
-                <div class="bg-white rounded-xl shadow p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
+                <div class="bg-white rounded-xl shadow p-4 sm:p-6">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1 min-w-0 mr-2">
                             <h4 class="font-bold text-dark">Заявка #${request.id}</h4>
-                            <p class="text-sm text-gray-500">${request.clientName} • ${request.clientEmail}</p>
-                            <p class="text-sm text-gray-500 mt-1">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</p>
+                            <p class="text-sm text-gray-500 truncate">${request.clientName} • ${request.clientEmail}</p>
+                            <p class="text-sm text-gray-500 mt-0.5">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</p>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-sm font-medium status-new">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium status-new flex-shrink-0">
                             <i class="fas fa-clock mr-1"></i>Новая
                         </span>
                     </div>
-                    <p class="text-gray-600 mb-4">${request.problem}</p>
-                    <div class="flex justify-end space-x-3">
-                        <button onclick="acceptRequest(${request.id})" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
+                    <p class="text-gray-600 text-sm mb-4">${request.problem}</p>
+                    <div class="flex flex-wrap gap-2 justify-end">
+                        <button onclick="acceptRequest(${request.id})" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition text-sm">
                             Принять в работу
                         </button>
-                        <button onclick="openEditModal(${request.id})" class="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition">
+                        <button onclick="openEditModal(${request.id})" class="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition text-sm">
                             Редактировать
                         </button>
                     </div>
-                </div>
-                `).join("");
+                </div>`).join("");
         }
 
         function renderInProgressOrders(requests) {
@@ -532,55 +544,53 @@
                 .map(request => {
                     const partsCost = request.parts.reduce((sum, part) => sum + part.cost, 0);
                     return `
-                    <div class="bg-white rounded-xl shadow p-6">
-                        <div class="flex justify-between items-start mb-4">
+                    <div class="bg-white rounded-xl shadow p-4 sm:p-6">
+                        <div class="flex justify-between items-start mb-3">
                             <div>
                                 <h4 class="font-bold text-dark">Заказ #${request.id}</h4>
                                 <p class="text-sm text-gray-500">${request.clientName} • ${getDeviceTypeLabel(request.deviceType)}</p>
                             </div>
-                            <span class="px-3 py-1 rounded-full text-sm font-medium status-in-progress">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium status-in-progress flex-shrink-0 ml-2">
                                 <i class="fas fa-tools mr-1"></i>В работе
                             </span>
                         </div>
-                        <p class="text-gray-600 mb-4">${request.problem}</p>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
+                        <p class="text-gray-600 text-sm mb-4">${request.problem}</p>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
                             <div>
-                                <p class="text-sm text-gray-500">Стоимость работы</p>
-                                <p class="font-medium">${request.laborCost} сум</p>
+                                <p class="text-xs text-gray-500">Стоимость работы</p>
+                                <p class="font-medium text-sm">${request.laborCost} сум</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Запчасти</p>
-                                <p class="font-medium">${partsCost} сум</p>
+                                <p class="text-xs text-gray-500">Запчасти</p>
+                                <p class="font-medium text-sm">${partsCost} сум</p>
                             </div>
                         </div>
-                        <div class="flex justify-end space-x-3">
-                            <button onclick="openEditModal(${request.id})" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
-                                <i class="fas fa-edit mr-2"></i>Редактировать
+                        <div class="flex flex-wrap gap-2 justify-end">
+                            <button onclick="openEditModal(${request.id})" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition text-sm">
+                                <i class="fas fa-edit mr-1"></i>Редактировать
                             </button>
-                            <button onclick="completeOrder(${request.id})" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-500 transition">
-                                <i class="fas fa-check mr-2"></i>Завершить
+                            <button onclick="completeOrder(${request.id})" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-500 transition text-sm">
+                                <i class="fas fa-check mr-1"></i>Завершить
                             </button>
                         </div>
-                    </div>
-                    `;
+                    </div>`;
                 }).join("");
         }
 
         function renderPartsList(parts) {
             if (parts.length === 0) {
-                return "<p class=\"text-gray-500 text-center py-4\">Запчасти не добавлены</p>";
+                return `<p class="text-gray-500 text-center py-4 text-sm">Запчасти не добавлены</p>`;
             }
             return parts.map((part, index) => `
                 <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                     <div>
-                        <p class="font-medium">${part.name}</p>
-                        <p class="text-sm text-gray-500">${part.cost} сум</p>
+                        <p class="font-medium text-sm">${part.name}</p>
+                        <p class="text-xs text-gray-500">${part.cost} сум</p>
                     </div>
-                    <button onclick="removePart(${index})" class="text-red-500 hover:text-red-700">
+                    <button onclick="removePart(${index})" class="text-red-500 hover:text-red-700 p-1">
                         <i class="fas fa-trash"></i>
                     </button>
-                </div>
-            `).join("");
+                </div>`).join("");
         }
 
         // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
@@ -593,9 +603,7 @@
             const newCount = repairRequests.filter(r => r.status === "new").length;
             const inProgressCount = repairRequests.filter(r => r.status === "in-progress").length;
             const completedCount = repairRequests.filter(r => r.status === "completed").length;
-            const totalRevenue = repairRequests
-                .filter(r => r.status === "completed")
-                .reduce((sum, r) => sum + r.totalCost, 0);
+            const totalRevenue = repairRequests.filter(r => r.status === "completed").reduce((sum, r) => sum + r.totalCost, 0);
 
             document.getElementById("new-requests-count").textContent = newCount;
             document.getElementById("in-progress-count").textContent = inProgressCount;
@@ -610,15 +618,16 @@
             document.getElementById("total-cost").value = laborCost + partsCost;
         }
 
-        // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
+        function syncLogoutButtons(show) {
+            document.getElementById("logout-btn").classList.toggle("hidden", !show);
+            document.getElementById("logout-btn-mobile").classList.toggle("hidden", !show);
+        }
+
+        // ==================== ОБРАБОТЧИКИ ====================
         function handleLogin() {
             const role = document.getElementById("user-role").value;
             const email = document.getElementById("login-email").value;
-            
-            if (!email) {
-                alert("Пожалуйста, введите email");
-                return;
-            }
+            if (!email) { alert("Пожалуйста, введите email"); return; }
 
             currentUser = {
                 role: role,
@@ -627,8 +636,10 @@
             };
 
             document.getElementById("auth-section").classList.add("hidden");
-            document.getElementById("user-info").innerHTML = renderUserInfo(currentUser);
-            document.getElementById("logout-btn").classList.remove("hidden");
+            const userInfoHtml = renderUserInfo(currentUser);
+            document.getElementById("user-info").innerHTML = userInfoHtml;
+            document.getElementById("user-info-mobile").innerHTML = userInfoHtml;
+            syncLogoutButtons(true);
 
             if (role === "client") {
                 document.getElementById("client-dashboard").classList.remove("hidden");
@@ -640,7 +651,7 @@
                 document.getElementById("new-requests-list").innerHTML = renderNewRequests(repairRequests);
                 document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
             }
-
+            closeMobileMenu();
         }
 
         function handleLogout() {
@@ -650,20 +661,25 @@
             document.getElementById("admin-dashboard").classList.add("hidden");
             document.getElementById("new-request-form").classList.add("hidden");
             document.getElementById("user-info").innerHTML = "";
-            document.getElementById("logout-btn").classList.add("hidden");
-            
-            // Сброс формы
+            document.getElementById("user-info-mobile").innerHTML = "";
+            syncLogoutButtons(false);
             document.getElementById("login-email").value = "";
             document.getElementById("login-password").value = "";
+            closeMobileMenu();
+        }
+
+        function closeMobileMenu() {
+            document.getElementById("mobile-menu").classList.add("hidden");
+            document.getElementById("hamburger-icon").className = "fas fa-bars text-xl";
         }
 
         function showNewRequestForm() {
             document.getElementById("new-request-form").classList.remove("hidden");
+            document.getElementById("new-request-form").scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
         function hideNewRequestForm() {
             document.getElementById("new-request-form").classList.add("hidden");
-            // Сброс формы
             document.getElementById("device-type").value = "";
             document.getElementById("device-brand").value = "";
             document.getElementById("problem-description").value = "";
@@ -673,7 +689,6 @@
             const deviceType = document.getElementById("device-type").value;
             const deviceBrand = document.getElementById("device-brand").value;
             const problem = document.getElementById("problem-description").value;
-
             if (!deviceType || !deviceBrand || !problem) {
                 alert("Пожалуйста, заполните все обязательные поля");
                 return;
@@ -683,20 +698,14 @@
                 id: repairRequests.length + 1,
                 clientName: currentUser.name,
                 clientEmail: currentUser.email,
-                deviceType: deviceType,
-                deviceBrand: deviceBrand,
-                problem: problem,
+                deviceType, deviceBrand, problem,
                 status: "new",
                 createdAt: new Date().toISOString().split('T')[0],
-                laborCost: 0,
-                parts: [],
-                totalCost: 0,
+                laborCost: 0, parts: [], totalCost: 0,
                 photo: `https://picsum.photos/400/300?random=${100 + repairRequests.length + 1}`
             };
 
             repairRequests.push(newRequest);
-            
-            // Обновление интерфейса
             document.getElementById("active-requests").innerHTML = renderActiveRequests(repairRequests);
             hideNewRequestForm();
             alert("Заявка успешно создана! Номер заявки: #" + newRequest.id);
@@ -713,15 +722,15 @@
             document.getElementById("modal-problem").textContent = order.problem;
             document.getElementById("modal-status").value = order.status;
             document.getElementById("labor-cost").value = order.laborCost;
-            
             document.getElementById("parts-list").innerHTML = renderPartsList(order.parts);
             calculateTotalCost();
-            
             document.getElementById("edit-order-modal").classList.remove("hidden");
+            document.body.style.overflow = "hidden";
         }
 
         function closeEditModal() {
             document.getElementById("edit-order-modal").classList.add("hidden");
+            document.body.style.overflow = "";
             editingOrderId = null;
         }
 
@@ -732,12 +741,11 @@
             const newStatus = document.getElementById("modal-status").value;
             const laborCost = parseInt(document.getElementById("labor-cost").value) || 0;
             const partsCost = repairRequests[orderIndex].parts.reduce((sum, p) => sum + p.cost, 0);
-            
+
             repairRequests[orderIndex].status = newStatus;
             repairRequests[orderIndex].laborCost = laborCost;
             repairRequests[orderIndex].totalCost = laborCost + partsCost;
 
-            // Обновление интерфейса
             if (currentUser.role === "admin" || currentUser.role === "master") {
                 updateStatistics();
                 document.getElementById("new-requests-list").innerHTML = renderNewRequests(repairRequests);
@@ -754,18 +762,13 @@
         function addPart() {
             const partName = prompt("Введите название запчасти:");
             if (!partName) return;
-
             const partCost = parseInt(prompt("Введите стоимость запчасти (сум):"));
             if (isNaN(partCost)) return;
 
             const orderIndex = repairRequests.findIndex(r => r.id === editingOrderId);
             if (orderIndex === -1) return;
 
-            repairRequests[orderIndex].parts.push({
-                name: partName,
-                cost: partCost
-            });
-
+            repairRequests[orderIndex].parts.push({ name: partName, cost: partCost });
             document.getElementById("parts-list").innerHTML = renderPartsList(repairRequests[orderIndex].parts);
             calculateTotalCost();
         }
@@ -773,7 +776,6 @@
         function removePart(index) {
             const orderIndex = repairRequests.findIndex(r => r.id === editingOrderId);
             if (orderIndex === -1) return;
-
             repairRequests[orderIndex].parts.splice(index, 1);
             document.getElementById("parts-list").innerHTML = renderPartsList(repairRequests[orderIndex].parts);
             calculateTotalCost();
@@ -782,32 +784,25 @@
         function acceptRequest(orderId) {
             const orderIndex = repairRequests.findIndex(r => r.id === orderId);
             if (orderIndex === -1) return;
-
             repairRequests[orderIndex].status = "in-progress";
-            
             updateStatistics();
             document.getElementById("new-requests-list").innerHTML = renderNewRequests(repairRequests);
             document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
-            
             alert("Заявка принята в работу!");
         }
 
         function completeOrder(orderId) {
             const orderIndex = repairRequests.findIndex(r => r.id === orderId);
             if (orderIndex === -1) return;
-
             repairRequests[orderIndex].status = "completed";
-            
             updateStatistics();
             document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
-            
             alert("Заказ завершен!");
         }
 
         function viewRequestDetails(orderId) {
             const order = repairRequests.find(r => r.id === orderId);
             if (!order) return;
-
             alert(`Детали заявки #${orderId}:\n\n` +
                   `Клиент: ${order.clientName}\n` +
                   `Устройство: ${order.deviceBrand} ${getDeviceTypeLabel(order.deviceType)}\n` +
@@ -818,48 +813,53 @@
 
         function leaveReview(orderId) {
             const review = prompt("Оставьте отзыв о качестве обслуживания:");
-            if (review) {
-                alert("Спасибо за ваш отзыв!");
-            }
+            if (review) alert("Спасибо за ваш отзыв!");
         }
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener("DOMContentLoaded", function() {
-            // Рендеринг навигации
             document.getElementById("nav-menu").innerHTML = renderNavigation(navigationItems);
+            document.getElementById("nav-menu-mobile").innerHTML = renderNavigationMobile(navigationItems);
 
-            // Обработчики событий
             document.getElementById("login-btn").addEventListener("click", handleLogin);
             document.getElementById("logout-btn").addEventListener("click", handleLogout);
+            document.getElementById("logout-btn-mobile").addEventListener("click", handleLogout);
             document.getElementById("new-request-btn").addEventListener("click", showNewRequestForm);
             document.getElementById("cancel-request-btn").addEventListener("click", hideNewRequestForm);
             document.getElementById("submit-request-btn").addEventListener("click", submitNewRequest);
-            document.getElementById("upload-photo-btn").addEventListener("click", () => {
-                document.getElementById("device-photo").click();
-            });
+            document.getElementById("upload-photo-btn").addEventListener("click", () => document.getElementById("device-photo").click());
             document.getElementById("close-modal-btn").addEventListener("click", closeEditModal);
             document.getElementById("cancel-edit-btn").addEventListener("click", closeEditModal);
             document.getElementById("save-order-btn").addEventListener("click", saveOrderChanges);
             document.getElementById("add-part-btn").addEventListener("click", addPart);
             document.getElementById("labor-cost").addEventListener("input", calculateTotalCost);
 
-            // Обработка навигации по ссылкам
+            // Гамбургер-меню
+            document.getElementById("hamburger-btn").addEventListener("click", function() {
+                const menu = document.getElementById("mobile-menu");
+                const icon = document.getElementById("hamburger-icon");
+                const isHidden = menu.classList.toggle("hidden");
+                icon.className = isHidden ? "fas fa-bars text-xl" : "fas fa-times text-xl";
+            });
+
+            // Закрытие модального окна по клику на фон
+            document.getElementById("edit-order-modal").addEventListener("click", function(e) {
+                if (e.target === this) closeEditModal();
+            });
+
+            // Навигация по ссылкам
             document.addEventListener("click", function(event) {
                 const link = event.target.closest("a[href^='#']");
                 if (!link) return;
                 event.preventDefault();
-                const targetId = link.getAttribute("href").substring(1);
-                const targetElement = document.getElementById(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                }
+                const targetElement = document.getElementById(link.getAttribute("href").substring(1));
+                if (targetElement) targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                closeMobileMenu();
             });
 
-            // Предзаполнение тестовых данных
             document.getElementById("login-email").value = "test@example.com";
         });
 
-        // Экспорт функций для использования в onclick
         window.viewRequestDetails = viewRequestDetails;
         window.leaveReview = leaveReview;
         window.openEditModal = openEditModal;
