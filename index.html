@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PC Services - Сервисный центр</title>
     <meta name="description" content="Веб-приложение для сервисного центра по ремонту компьютерной техники. Создание заявок, управление ремонтами, учет запчастей.">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PC Services">
+    <link rel="apple-touch-icon" href="icon.svg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -867,6 +877,60 @@
         window.completeOrder = completeOrder;
         window.addPart = addPart;
         window.removePart = removePart;
+
+        // ==================== PWA ====================
+        let deferredPrompt = null;
+        const installBanner = document.getElementById("install-banner");
+        const installBtn = document.getElementById("install-btn");
+        const installClose = document.getElementById("install-close");
+
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBanner.classList.remove("hidden");
+        });
+
+        installBtn.addEventListener("click", async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            installBanner.classList.add("hidden");
+        });
+
+        installClose.addEventListener("click", () => {
+            installBanner.classList.add("hidden");
+        });
+
+        window.addEventListener("appinstalled", () => {
+            installBanner.classList.add("hidden");
+            deferredPrompt = null;
+        });
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js").catch(() => {});
+            });
+        }
     </script>
+
+    <!-- Баннер установки приложения -->
+    <div id="install-banner" class="hidden fixed bottom-0 left-0 right-0 z-50 p-4 bg-white border-t border-gray-200 shadow-lg sm:bottom-4 sm:left-4 sm:right-auto sm:rounded-xl sm:border sm:max-w-sm">
+        <div class="flex items-start space-x-3">
+            <img src="icon.svg" class="w-12 h-12 rounded-xl flex-shrink-0" alt="PC Services">
+            <div class="flex-1 min-w-0">
+                <p class="font-bold text-dark text-sm">Установить PC Services</p>
+                <p class="text-xs text-gray-500 mt-0.5">Добавить на главный экран для быстрого доступа</p>
+                <div class="flex gap-2 mt-2">
+                    <button id="install-btn" class="bg-primary text-white text-xs px-4 py-1.5 rounded-lg hover:bg-secondary transition font-medium">
+                        Установить
+                    </button>
+                    <button id="install-close" class="text-gray-500 text-xs px-3 py-1.5 rounded-lg hover:bg-gray-100 transition">
+                        Не сейчас
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
