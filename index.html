@@ -44,6 +44,7 @@
         body { font-family: 'Inter', sans-serif; }
         .status-new { background-color: #fef3c7; color: #92400e; }
         .status-in-progress { background-color: #dbeafe; color: #1e40af; }
+        .status-pending-approval { background-color: #fef3f0; color: #92400e; }
         .status-completed { background-color: #d1fae5; color: #065f46; }
         .status-cancelled { background-color: #fee2e2; color: #991b1b; }
         .user-client { background-color: #e0e7ff; color: #3730a3; }
@@ -379,6 +380,7 @@
         const statusConfig = {
             "new": { "label": "Новая", "class": "status-new", "icon": "fas fa-clock" },
             "in-progress": { "label": "В работе", "class": "status-in-progress", "icon": "fas fa-tools" },
+            "pending-approval": { "label": "Ожидает ответа", "class": "status-pending-approval", "icon": "fas fa-hourglass-half" },
             "completed": { "label": "Завершено", "class": "status-completed", "icon": "fas fa-check-circle" },
             "cancelled": { "label": "Отменено", "class": "status-cancelled", "icon": "fas fa-times-circle" }
         };
@@ -480,6 +482,28 @@
             }
             return filtered.map(request => {
                 const status = statusConfig[request.status];
+                const partsCost = request.parts.reduce((sum, p) => sum + p.cost, 0);
+                const totalCostText = request.totalCost > 0 ? `${request.totalCost} сум` : "не рассчитана";
+                const approvalAction = request.status === "pending-approval" ? `
+                    <div class="text-sm text-gray-600 mb-4">
+                        <p>Стоимость услуги: ${request.laborCost} сум</p>
+                        <p>Стоимость запчастей: ${partsCost} сум</p>
+                        <p class="font-medium">Итого: ${totalCostText}</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 justify-end">
+                        <button onclick="confirmOrder(${request.id})" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-500 transition text-sm">
+                            Подтвердить
+                        </button>
+                        <button onclick="rejectOrder(${request.id})" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition text-sm">
+                            Отказаться
+                        </button>
+                    </div>` : `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-500">${request.createdAt}</span>
+                        <button class="text-primary hover:text-secondary font-medium text-sm" onclick="viewRequestDetails(${request.id})">
+                            Подробнее <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>`;
                 return `
                 <div class="bg-white rounded-xl shadow p-4 sm:p-6">
                     <div class="flex justify-between items-start mb-3">
@@ -492,12 +516,7 @@
                         </span>
                     </div>
                     <p class="text-gray-600 text-sm mb-4">${request.problem}</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-500">${request.createdAt}</span>
-                        <button class="text-primary hover:text-secondary font-medium text-sm" onclick="viewRequestDetails(${request.id})">
-                            Подробнее <i class="fas fa-arrow-right ml-1"></i>
-                        </button>
-                    </div>
+                    ${approvalAction}
                 </div>`;
             }).join("");
         }
@@ -584,6 +603,9 @@
                         <div class="flex flex-wrap gap-2 justify-end">
                             <button onclick="openEditModal(${request.id})" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition text-sm">
                                 <i class="fas fa-edit mr-1"></i>Редактировать
+                            </button>
+                            <button onclick="sendForApproval(${request.id})" class="bg-warning text-dark px-4 py-2 rounded-lg hover:bg-yellow-400 transition text-sm">
+                                <i class="fas fa-hourglass-half mr-1"></i>Ожидание ответа
                             </button>
                             <button onclick="completeOrder(${request.id})" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-500 transition text-sm">
                                 <i class="fas fa-check mr-1"></i>Завершить
@@ -828,6 +850,20 @@
             alert("Заявка принята в работу!");
         }
 
+        function sendForApproval(orderId) {
+            const orderIndex = repairRequests.findIndex(r => r.id === orderId);
+            if (orderIndex === -1) return;
+            repairRequests[orderIndex].status = "pending-approval";
+            if (repairRequests[orderIndex].totalCost === 0) {
+                const partsCost = repairRequests[orderIndex].parts.reduce((sum, part) => sum + part.cost, 0);
+                repairRequests[orderIndex].totalCost = repairRequests[orderIndex].laborCost + partsCost;
+            }
+            updateStatistics();
+            document.getElementById("new-requests-list").innerHTML = renderNewRequests(repairRequests);
+            document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
+            alert("Заявка переведена в ожидание ответа клиента.");
+        }
+
         function completeOrder(orderId) {
             const orderIndex = repairRequests.findIndex(r => r.id === orderId);
             if (orderIndex === -1) return;
@@ -840,12 +876,35 @@
         function viewRequestDetails(orderId) {
             const order = repairRequests.find(r => r.id === orderId);
             if (!order) return;
+            const partsCost = order.parts.reduce((sum, part) => sum + part.cost, 0);
             alert(`Детали заявки #${orderId}:\n\n` +
                   `Клиент: ${order.clientName}\n` +
                   `Устройство: ${order.deviceBrand} ${getDeviceTypeLabel(order.deviceType)}\n` +
                   `Проблема: ${order.problem}\n` +
                   `Статус: ${statusConfig[order.status].label}\n` +
-                  `Стоимость: ${order.totalCost > 0 ? order.totalCost + " сум" : "не рассчитана"}`);
+                  `Стоимость работы: ${order.laborCost} сум\n` +
+                  `Стоимость запчастей: ${partsCost} сум\n` +
+                  `Итого: ${order.totalCost > 0 ? order.totalCost + " сум" : "не рассчитана"}`);
+        }
+
+        function confirmOrder(orderId) {
+            const orderIndex = repairRequests.findIndex(r => r.id === orderId);
+            if (orderIndex === -1) return;
+            repairRequests[orderIndex].status = "in-progress";
+            updateStatistics();
+            document.getElementById("active-requests").innerHTML = renderActiveRequests(repairRequests);
+            document.getElementById("history-table-body").innerHTML = renderOrderHistory(repairRequests);
+            alert("Вы подтвердили заказ. Мастер может продолжать работу.");
+        }
+
+        function rejectOrder(orderId) {
+            const orderIndex = repairRequests.findIndex(r => r.id === orderId);
+            if (orderIndex === -1) return;
+            repairRequests[orderIndex].status = "cancelled";
+            updateStatistics();
+            document.getElementById("active-requests").innerHTML = renderActiveRequests(repairRequests);
+            document.getElementById("history-table-body").innerHTML = renderOrderHistory(repairRequests);
+            alert("Вы отказались от заказа. Статус изменен на Отменено.");
         }
 
         function leaveReview(orderId) {
