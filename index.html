@@ -498,9 +498,9 @@
                 "problem": "Синий экран при запуске Windows",
                 "status": "in-progress",
                 "createdAt": "2024-01-14",
-                "laborCost": 2000,
-                "parts": [{ "name": "Оперативная память 8GB", "cost": 3500 }],
-                "totalCost": 5500,
+                "laborCost": 100000,
+                "parts": [{ "name": "Оперативная память 8GB", "cost": 350000 }],
+                "totalCost": 450000,
                 "photo": "https://picsum.photos/400/300?random=102"
             },
             {
@@ -556,13 +556,12 @@
             if (!user) return "";
             const userType = userTypes[user.role];
             const isClient = user.role === "client";
-            const clickable = isClient ? "cursor-pointer hover:opacity-80 transition" : "";
-            const onclick = isClient ? "onclick=\"openEditProfileModal()\"" : "";
-            return `<div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-sm ${userType.class} ${clickable}" ${onclick} title="${isClient ? 'Нажмите для редактирования' : ''}"><i class="${userType.icon}"></i><span class="hidden sm:inline">${userType.label}: ${user.name}</span><span class="sm:hidden">${user.name}</span></div>`;
+            const clickable = isClient ? "cursor-pointer hover:opacity-80 transition client-profile-trigger" : "";
+            return `<div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-sm ${userType.class} ${clickable}" title="${isClient ? 'Нажмите для редактирования' : ''}"><i class="${userType.icon}"></i><span class="hidden sm:inline">${userType.label}: ${user.name}</span><span class="sm:hidden">${user.name}</span></div>`;
         }
 
         function renderActiveRequests(requests) {
-            const filtered = requests.filter(r => r.status !== "completed" && r.status !== "cancelled");
+            const filtered = requests.filter(r => r.status !== "completed" && r.status !== "cancelled" && r.status !== "rejected");
             if (filtered.length === 0) {
                 return `<div class="col-span-full text-center text-gray-500 py-8"><i class="fas fa-inbox text-4xl mb-3 block text-gray-300"></i>Активных заявок нет</div>`;
             }
@@ -761,7 +760,7 @@
                 name: role === "client" ? "Alisher Uzaqbergenov" : role === "master" ? "Мастер" : "Администратор",
                 email: email
             };
-
+            closeEditProfileModal();
             document.getElementById("auth-section").classList.add("hidden");
             const userInfoHtml = renderUserInfo(currentUser);
             document.getElementById("user-info").innerHTML = userInfoHtml;
@@ -810,6 +809,9 @@
             syncLogoutButtons(false);
             document.getElementById("login-email").value = "";
             document.getElementById("login-password").value = "";
+            document.getElementById("edit-order-modal").classList.add("hidden");
+            document.getElementById("edit-profile-modal").classList.add("hidden");
+            document.body.style.overflow = "";
             // Скрыть все страницы и показать первые
             document.getElementById("client-active-requests-page").classList.remove("hidden");
             document.getElementById("client-history-page").classList.add("hidden");
@@ -1235,6 +1237,11 @@
 
             // Навигация по ссылкам
             document.addEventListener("click", function(event) {
+                const profileTrigger = event.target.closest(".client-profile-trigger");
+                if (profileTrigger) {
+                    openEditProfileModal();
+                    return;
+                }
                 const link = event.target.closest("a[href^='#']");
                 if (!link) return;
                 event.preventDefault();
