@@ -165,7 +165,12 @@
 
             <!-- История заказов -->
             <div>
-                <h3 class="text-lg sm:text-xl font-bold text-dark mb-4">История заказов</h3>
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                    <h3 class="text-lg sm:text-xl font-bold text-dark">История заказов</h3>
+                    <button id="clear-history-btn" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-medium hover:bg-red-200 transition text-sm">
+                        <i class="fas fa-trash-alt mr-2"></i>Очистить историю
+                    </button>
+                </div>
                 <div id="order-history" class="bg-white rounded-xl shadow overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -749,6 +754,23 @@
             editingOrderId = null;
         }
 
+        function clearOrderHistory() {
+            const confirmed = confirm("Вы уверены, что хотите очистить всю историю заказов? Это действие нельзя отменить.");
+            if (!confirmed) return;
+
+            repairRequests = repairRequests.filter(r => r.status !== "completed" && r.status !== "cancelled");
+            document.getElementById("history-table-body").innerHTML = renderOrderHistory(repairRequests);
+            if (currentUser && (currentUser.role === "admin" || currentUser.role === "master")) {
+                updateStatistics();
+                document.getElementById("new-requests-list").innerHTML = renderNewRequests(repairRequests);
+                document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
+            } else if (currentUser) {
+                document.getElementById("active-requests").innerHTML = renderActiveRequests(repairRequests);
+            }
+
+            alert("История заказов очищена.");
+        }
+
         function saveOrderChanges() {
             const orderIndex = repairRequests.findIndex(r => r.id === editingOrderId);
             if (orderIndex === -1) return;
@@ -873,6 +895,8 @@
             });
 
             document.getElementById("login-email").value = "test@example.com";
+
+            document.getElementById("clear-history-btn").addEventListener("click", clearOrderHistory);
 
             // Устанавливаем начальное состояние истории
             history.replaceState({ v: 'auth' }, '');
