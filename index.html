@@ -608,29 +608,80 @@
 
         function renderOrderHistory(requests) {
             return requests.filter(r => !r.clientArchivedAt && ["completed", "cancelled", "rejected"].includes(r.status))
-                .map(request => {
-                    const status = statusConfig[request.status];
-                    return `
-                    <tr>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.createdAt}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="px-2 py-1 rounded-full text-xs font-medium ${status.class}">${status.label}</span>
-                        </td>
+                .map(request => renderHistoryRow(request, false))
+                .join("");
+        }
+
+        function renderAdminHistory(requests) {
+            return requests.filter(r => ["completed", "cancelled", "rejected"].includes(r.status))
+                .map(request => renderHistoryRow(request, true))
+                .join("");
+        }
+
+        function renderHistoryRow(request, isAdmin) {
+            const status = statusConfig[request.status];
+            const partsCost = request.parts.reduce((sum, part) => sum + part.cost, 0);
+            const partsList = request.parts.length > 0
+                ? request.parts.map(part => `<div class="flex justify-between text-sm text-gray-600 mb-1"><span>${part.name}</span><span>${part.cost} сум</span></div>`).join("")
+                : `<div class="text-sm text-gray-500">Запчастей не добавлено</div>`;
+            const deviceLabel = `${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}`;
+            const detailsId = `history-details-${request.id}`;
+            const firstColumn = isAdmin
+                ? `<td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.clientName}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${deviceLabel}</td>`
+                : `<td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${deviceLabel}</td>`;
+            const actionCell = isAdmin
+                ? `
                         <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${request.totalCost > 0 ? "text-green-600" : "text-gray-500"}">
                             ${request.totalCost > 0 ? request.totalCost + " сум" : "—"}
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm">
-                            <button onclick="leaveReview(${request.id})" class="text-primary hover:text-secondary mr-2">
-                                <i class="fas fa-star mr-1"></i><span class="hidden sm:inline">Отзыв</span>
+                            <button onclick="toggleHistoryDetails(${request.id})" class="text-primary hover:text-secondary font-medium text-sm">
+                                Подробнее <i class="fas fa-chevron-down ml-1"></i>
                             </button>
-                            <button onclick="viewRequestDetails(${request.id})" class="text-gray-600 hover:text-dark">
-                                <i class="fas fa-eye mr-1"></i><span class="hidden sm:inline">Просмотр</span>
+                        </td>`
+                : `<td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${request.totalCost > 0 ? "text-green-600" : "text-gray-500"}">
+                            ${request.totalCost > 0 ? request.totalCost + " сум" : "—"}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm">
+                            <button onclick="toggleHistoryDetails(${request.id})" class="text-primary hover:text-secondary font-medium text-sm">
+                                Подробнее <i class="fas fa-chevron-down ml-1"></i>
                             </button>
+                        </td>`;
+            return `
+                    <tr class="bg-white">
+                        ${firstColumn}
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.createdAt}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${status.class}">${status.label}</span>
+                        </td>
+                        ${actionCell}
+                    </tr>
+                    <tr class="bg-gray-50">
+                        <td colspan="${isAdmin ? 6 : 6}" class="p-0 border-t-0">
+                            <div id="${detailsId}" class="history-details-content px-4">
+                                <div class="py-4">
+                                    <div class="grid gap-3 sm:grid-cols-3">
+                                        <div class="text-sm text-gray-600"><span class="font-medium">Стоимость работы:</span> ${request.laborCost} сум</div>
+                                        <div class="text-sm text-gray-600"><span class="font-medium">Запчасти:</span> ${partsCost} сум</div>
+                                        <div class="text-sm text-gray-600"><span class="font-medium">Итог:</span> ${request.totalCost > 0 ? request.totalCost + " сум" : "—"}</div>
+                                    </div>
+                                    <div class="mt-4 border-t border-gray-200 pt-4">
+                                        <div class="text-sm font-medium text-dark mb-2">Состав запчастей</div>
+                                        ${partsList}
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>`;
-                }).join("");
+        }
+
+        function toggleHistoryDetails(orderId) {
+            const details = document.getElementById(`history-details-${orderId}`);
+            if (!details) return;
+            details.classList.toggle('open');
         }
 
         function renderNewRequests(requests) {
@@ -776,23 +827,7 @@
                 updateStatistics();
                 document.getElementById("new-requests-list").innerHTML = renderNewRequests(repairRequests);
                 document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
-                const adminHistory = repairRequests.filter(r => ["completed", "cancelled", "rejected"].includes(r.status)).map(request => {
-                    const status = statusConfig[request.status];
-                    return `
-                    <tr>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.clientName}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.createdAt}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="px-2 py-1 rounded-full text-xs font-medium ${status.class}">${status.label}</span>
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${request.totalCost > 0 ? "text-green-600" : "text-gray-500"}">
-                            ${request.totalCost > 0 ? request.totalCost + " сум" : "—"}
-                        </td>
-                    </tr>`;
-                }).join("");
-                document.getElementById("admin-history-table-body").innerHTML = adminHistory;
+                document.getElementById("admin-history-table-body").innerHTML = renderAdminHistory(repairRequests);
             }
             history.pushState({ v: 'dashboard' }, '');
             closeMobileMenu();
@@ -1020,23 +1055,7 @@
                 updateStatistics();
                 document.getElementById("new-requests-list").innerHTML = renderNewRequests(repairRequests);
                 document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
-                const adminHistory = repairRequests.filter(r => ["completed", "cancelled", "rejected"].includes(r.status)).map(request => {
-                    const status = statusConfig[request.status];
-                    return `
-                    <tr>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.clientName}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.createdAt}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="px-2 py-1 rounded-full text-xs font-medium ${status.class}">${status.label}</span>
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${request.totalCost > 0 ? "text-green-600" : "text-gray-500"}">
-                            ${request.totalCost > 0 ? request.totalCost + " сум" : "—"}
-                        </td>
-                    </tr>`;
-                }).join("");
-                document.getElementById("admin-history-table-body").innerHTML = adminHistory;
+                document.getElementById("admin-history-table-body").innerHTML = renderAdminHistory(repairRequests);
             } else {
                 document.getElementById("active-requests").innerHTML = renderActiveRequests(repairRequests);
                 document.getElementById("history-table-body").innerHTML = renderOrderHistory(repairRequests);
@@ -1098,24 +1117,8 @@
             repairRequests[orderIndex].status = "completed";
             updateStatistics();
             document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
-            const adminHistory = repairRequests.filter(r => ["completed", "cancelled", "rejected"].includes(r.status)).map(request => {
-                const status = statusConfig[request.status];
-                return `
-                <tr>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.clientName}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.createdAt}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <span class="px-2 py-1 rounded-full text-xs font-medium ${status.class}">${status.label}</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${request.totalCost > 0 ? "text-green-600" : "text-gray-500"}">
-                        ${request.totalCost > 0 ? request.totalCost + " сум" : "—"}
-                    </td>
-                </tr>`;
-            }).join("");
             if (currentUser && currentUser.role === "master") {
-                document.getElementById("admin-history-table-body").innerHTML = adminHistory;
+                document.getElementById("admin-history-table-body").innerHTML = renderAdminHistory(repairRequests);
             }
             alert("Заказ завершен!");
         }
@@ -1141,25 +1144,9 @@
             updateStatistics();
             document.getElementById("active-requests").innerHTML = renderActiveRequests(repairRequests);
             document.getElementById("history-table-body").innerHTML = renderOrderHistory(repairRequests);
-            const adminHistory = repairRequests.filter(r => ["completed", "cancelled", "rejected"].includes(r.status)).map(request => {
-                const status = statusConfig[request.status];
-                return `
-                <tr>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.clientName}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.createdAt}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <span class="px-2 py-1 rounded-full text-xs font-medium ${status.class}">${status.label}</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${request.totalCost > 0 ? "text-green-600" : "text-gray-500"}">
-                        ${request.totalCost > 0 ? request.totalCost + " сум" : "—"}
-                    </td>
-                </tr>`;
-            }).join("");
             if (currentUser && currentUser.role === "master") {
                 document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
-                document.getElementById("admin-history-table-body").innerHTML = adminHistory;
+                document.getElementById("admin-history-table-body").innerHTML = renderAdminHistory(repairRequests);
             }
             alert("Вы подтвердили заказ. Статус изменен на Принято.");
         }
@@ -1171,25 +1158,9 @@
             updateStatistics();
             document.getElementById("active-requests").innerHTML = renderActiveRequests(repairRequests);
             document.getElementById("history-table-body").innerHTML = renderOrderHistory(repairRequests);
-            const adminHistory = repairRequests.filter(r => ["completed", "cancelled", "rejected"].includes(r.status)).map(request => {
-                const status = statusConfig[request.status];
-                return `
-                <tr>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-dark">#${request.id}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.clientName}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.deviceBrand} ${getDeviceTypeLabel(request.deviceType)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${request.createdAt}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <span class="px-2 py-1 rounded-full text-xs font-medium ${status.class}">${status.label}</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium ${request.totalCost > 0 ? "text-green-600" : "text-gray-500"}">
-                        ${request.totalCost > 0 ? request.totalCost + " сум" : "—"}
-                    </td>
-                </tr>`;
-            }).join("");
             if (currentUser && currentUser.role === "master") {
                 document.getElementById("in-progress-orders").innerHTML = renderInProgressOrders(repairRequests);
-                document.getElementById("admin-history-table-body").innerHTML = adminHistory;
+                document.getElementById("admin-history-table-body").innerHTML = renderAdminHistory(repairRequests);
             }
             alert("Вы отказались от заказа. Статус изменен на Отказано.");
         }
